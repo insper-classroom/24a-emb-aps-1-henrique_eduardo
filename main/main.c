@@ -15,6 +15,7 @@ const int BTN_PIN_B = 16;
 const int BTN_PIN_G = 17;
 const int BTN_PIN_R = 13;
 const int BTN_PIN_Y = 12;
+const int BTN_PIN_START = 14;
 const int LED_B = 18;
 const int LED_G = 19;
 const int LED_R = 20;
@@ -24,26 +25,34 @@ volatile int blue_flag = 0;
 volatile int green_flag = 0;
 volatile int red_flag = 0;
 volatile int yellow_flag = 0;
-volatile int flag_start = 1;
+volatile int flag_start = 0;
 volatile int blue = 0;
 volatile int green = 0;
 volatile int red = 0;
 volatile int yellow = 0;
+volatile int btn_pressed_player=10;
 
 void btn_callback(uint gpio, uint32_t events) {
     // Handle the button press based on the GPIO and events
     if (events == 0x4) { // Falling edge
         if (gpio == BTN_PIN_B) {
             blue_flag = 1;
+            btn_pressed_player=0;
         }
         else if (gpio == BTN_PIN_G) {
             green_flag = 1;
+            btn_pressed_player=1;
         }
         else if (gpio == BTN_PIN_R) {
             red_flag = 1;
+            btn_pressed_player=2;
         }
         else if (gpio == BTN_PIN_Y) {
             yellow_flag = 1;
+            btn_pressed_player=3;
+        }
+        else if (gpio == BTN_PIN_START) {
+            flag_start= 1;
         }
     }
 }
@@ -148,7 +157,7 @@ int main() {
   int player_answer[16];
   int round = 1;
   int count = 0;
-
+  int errou=0;
   stdio_init_all();
 
   gpio_init(BUZZER);
@@ -182,6 +191,11 @@ int main() {
   gpio_set_dir(BTN_PIN_Y, GPIO_IN);
   gpio_pull_up(BTN_PIN_Y);
 
+  gpio_init(BTN_PIN_START);
+  gpio_set_dir(BTN_PIN_START, GPIO_IN);
+  gpio_pull_up(BTN_PIN_START);
+
+
   // callback led r (first)
   gpio_set_irq_enabled_with_callback(BTN_PIN_B, GPIO_IRQ_EDGE_FALL, true,
                                       &btn_callback);
@@ -190,6 +204,7 @@ int main() {
   gpio_set_irq_enabled(BTN_PIN_G, GPIO_IRQ_EDGE_FALL, true);
   gpio_set_irq_enabled(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true);
   gpio_set_irq_enabled(BTN_PIN_Y, GPIO_IRQ_EDGE_FALL, true);
+  gpio_set_irq_enabled(BTN_PIN_START, GPIO_IRQ_EDGE_FALL, true);
 
   while (true) {
     if(flag_start == 1)
@@ -212,7 +227,9 @@ int main() {
         sleep_ms(200);
         play(440, 100, BUZZER);
         blue_flag = 0;
-        player_answer[count] = 0;
+        if(answer[count] != btn_pressed_player){
+            errou=1;
+        }
         count += 1;
       }
       if (green_flag) {
@@ -220,6 +237,10 @@ int main() {
         play(392, 100, BUZZER);
         green_flag = 0;
         player_answer[count] = 1;
+        
+        if(answer[count] != btn_pressed_player){
+            errou=1;
+        }
         count += 1;
       }
       if (red_flag) {
@@ -227,6 +248,9 @@ int main() {
         play(262, 100, BUZZER);
         red_flag = 0;
         player_answer[count] = 2;
+        if(answer[count] != btn_pressed_player){
+            errou=1;
+        }
         count += 1;
       }
       if (yellow_flag) {
@@ -234,10 +258,13 @@ int main() {
         play(294, 100, BUZZER);
         yellow_flag = 0;
         player_answer[count] = 3;
+        if(answer[count] != btn_pressed_player){
+            errou=1;
+        }
         count += 1;
       }
 
-      if (igualNoIntervalo(answer, player_answer, 0, count) == 1 && round == count)
+      if (!errou)
       {
         for (int i = 0; i < 3; i++) 
         {
@@ -278,6 +305,7 @@ int main() {
         red = 0;
         yellow = 0;
         play_once = 0;
+        errou=0;
         for (int i = 0; i < 16; i++) {
           player_answer[i] = 5;
         }
