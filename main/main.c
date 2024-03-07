@@ -11,21 +11,31 @@
 #include <time.h>
 #include <stdlib.h>
 
-const int BTN_PIN_B = 16;
-const int BTN_PIN_G = 17;
-const int BTN_PIN_R = 13;
-const int BTN_PIN_Y = 12;
-const int BTN_PIN_START = 14;
-const int LED_B = 18;
-const int LED_G = 19;
-const int LED_R = 20;
-const int LED_Y = 22; 
-const int BUZZER = 15;
+const int BTN_PIN_B = 22;
+const int BTN_PIN_G = 20;
+const int BTN_PIN_R = 26;
+const int BTN_PIN_Y = 21;
+const int BTN_PIN_START = 13;
+
+const int LED_B = 19;
+const int LED_G = 17;
+const int LED_R = 18;
+const int LED_Y = 16; 
+
+const int LED_R_RGB = 12;
+const int LED_G_RGB = 11;
+const int LED_B_RGB = 10;
+
+
+
+const int BUZZER = 2;
+
 volatile int blue_flag = 0;
 volatile int green_flag = 0;
 volatile int red_flag = 0;
 volatile int yellow_flag = 0;
 volatile int flag_start = 0;
+
 volatile int blue = 0;
 volatile int green = 0;
 volatile int red = 0;
@@ -151,6 +161,7 @@ void start_game(int pino, int sequence[], int length) {
   flag_start = 2;
 }
 
+
 int main() {
   int play_once = 0;
   int answer[16];
@@ -173,6 +184,15 @@ int main() {
 
   gpio_init(LED_Y);
   gpio_set_dir(LED_Y, GPIO_OUT);
+
+  gpio_init(LED_R_RGB);
+  gpio_set_dir(LED_R_RGB, GPIO_OUT);
+
+  gpio_init(LED_B_RGB);
+  gpio_set_dir(LED_B_RGB, GPIO_OUT);
+
+  gpio_init(LED_G_RGB);
+  gpio_set_dir(LED_G_RGB, GPIO_OUT);
 
   gpio_init(BTN_PIN_B);
   gpio_set_dir(BTN_PIN_B, GPIO_IN);
@@ -204,7 +224,7 @@ int main() {
   gpio_set_irq_enabled(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true);
   gpio_set_irq_enabled(BTN_PIN_Y, GPIO_IRQ_EDGE_FALL, true);
   gpio_set_irq_enabled(BTN_PIN_START, GPIO_IRQ_EDGE_FALL, true);
-
+  
   while (true) {
     if(flag_start == 1)
     {
@@ -233,6 +253,10 @@ int main() {
         {
           errou = 2;
         }
+        gpio_put(LED_B, 1);
+        sleep_ms(500);
+        gpio_put(LED_B, 0);
+        sleep_ms(500);
         count += 1;
       }
       if (green_flag) {
@@ -246,6 +270,10 @@ int main() {
         {
           errou = 2;
         }
+        gpio_put(LED_G, 1);
+        sleep_ms(500);
+        gpio_put(LED_G, 0);
+        sleep_ms(500);
         count += 1;
       }
       if (red_flag) {
@@ -259,6 +287,10 @@ int main() {
         {
           errou = 2;
         }
+        gpio_put(LED_R, 1);
+        sleep_ms(500);
+        gpio_put(LED_R, 0);
+        sleep_ms(500);
         count += 1;
       }
       if (yellow_flag) {
@@ -272,6 +304,10 @@ int main() {
         {
           errou = 2;
         }
+        gpio_put(LED_Y, 1);
+        sleep_ms(500);
+        gpio_put(LED_Y, 0);
+        sleep_ms(500);
         count += 1;
       }
 
@@ -279,9 +315,9 @@ int main() {
       {
         for (int i = 0; i < 3; i++) 
         {
-          gpio_put(LED_G, 1);
+          gpio_put(LED_G_RGB, 1);
           sleep_ms(500);
-          gpio_put(LED_G, 0);
+          gpio_put(LED_G_RGB, 0);
           sleep_ms(500);
         }
         play_victory_theme(BUZZER);
@@ -300,9 +336,9 @@ int main() {
       {
         for (int i = 0; i < 3; i++) 
         {
-          gpio_put(LED_R, 1);
+          gpio_put(LED_R_RGB, 1);
           sleep_ms(500);
-          gpio_put(LED_R, 0);
+          gpio_put(LED_R_RGB, 0);
           sleep_ms(500);
         }
         play_loss_theme(BUZZER);
