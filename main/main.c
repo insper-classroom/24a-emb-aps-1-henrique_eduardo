@@ -24,28 +24,13 @@ volatile int blue_flag = 0;
 volatile int green_flag = 0;
 volatile int red_flag = 0;
 volatile int yellow_flag = 0;
+volatile int flag_start = 1;
 volatile int blue = 0;
 volatile int green = 0;
 volatile int red = 0;
 volatile int yellow = 0;
 
-#define DEBOUNCE_DELAY_MS 50
-
-volatile uint32_t last_button_press_time = 0;
-
 void btn_callback(uint gpio, uint32_t events) {
-    // Get the current time
-    uint32_t current_time = to_ms_since_boot(get_absolute_time());
-
-    // Check if it's been long enough since the last button press
-    if (current_time - last_button_press_time < DEBOUNCE_DELAY_MS) {
-        // If it hasn't been long enough, ignore this button press
-        return;
-    }
-
-    // Record the time of this button press
-    last_button_press_time = current_time;
-
     // Handle the button press based on the GPIO and events
     if (events == 0x4) { // Falling edge
         if (gpio == BTN_PIN_B) {
@@ -65,7 +50,9 @@ void btn_callback(uint gpio, uint32_t events) {
 
 
 void generateSequence(int sequence[], int length) {
-    srand(time(NULL));
+    absolute_time_t start_time = get_absolute_time();
+    uint64_t start_time_us = to_ms_since_boot(start_time);
+    srand(start_time_us);
 
     for (int i = 0; i < length; i++) {
         sequence[i] = rand() % 4;
@@ -149,6 +136,12 @@ int igualNoIntervalo(int v[], int v2[], int l, int r) {
     return igualNoIntervalo(v, v2, l + 1, r);
 }
 
+void start_game(int pino, int sequence[], int length) {
+  play_victory_theme(BUZZER);
+  generateSequence(sequence, length);
+  flag_start = 2;
+}
+
 int main() {
   int play_once = 0;
   int answer[16];
@@ -198,92 +191,99 @@ int main() {
   gpio_set_irq_enabled(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true);
   gpio_set_irq_enabled(BTN_PIN_Y, GPIO_IRQ_EDGE_FALL, true);
 
-  generateSequence(answer, 16);
-
   while (true) {
-    if (play_once == 0)
+    if(flag_start == 1)
     {
-      for (int i = 0; i < round; i++)
+      start_game(BUZZER, answer, 16);
+    }
+    else if (flag_start == 2)
+    {
+      if (play_once == 0)
       {
-        displayColor(answer[i]);
+        for (int i = 0; i < round; i++)
+        {
+          displayColor(answer[i]);
+        }
+
+        play_once = 1;
+      }
+      
+      if (blue_flag) {
+        sleep_ms(200);
+        play(440, 100, BUZZER);
+        blue_flag = 0;
+        player_answer[count] = 0;
+        count += 1;
+      }
+      if (green_flag) {
+        sleep_ms(200);
+        play(392, 100, BUZZER);
+        green_flag = 0;
+        player_answer[count] = 1;
+        count += 1;
+      }
+      if (red_flag) {
+        sleep_ms(200);
+        play(262, 100, BUZZER);
+        red_flag = 0;
+        player_answer[count] = 2;
+        count += 1;
+      }
+      if (yellow_flag) {
+        sleep_ms(200);
+        play(294, 100, BUZZER);
+        yellow_flag = 0;
+        player_answer[count] = 3;
+        count += 1;
       }
 
-      play_once = 1;
+      if (igualNoIntervalo(answer, player_answer, 0, count) == 1 && round == count)
+      {
+        for (int i = 0; i < 3; i++) 
+        {
+          gpio_put(LED_G, 1);
+          sleep_ms(500);
+          gpio_put(LED_G, 0);
+          sleep_ms(500);
+        }
+        play_victory_theme(BUZZER);
+
+        round += 1;      
+        count = 0;
+        blue = 0;
+        green = 0;
+        red = 0;
+        yellow = 0;
+        play_once = 0;
+        for (int i = 0; i < 16; i++) {
+          player_answer[i] = 5;
+        }
+      }
+
+      else if (round < count || player_answer[round-1] < 4)    
+      {
+        for (int i = 0; i < 3; i++) 
+        {
+          gpio_put(LED_R, 1);
+          sleep_ms(500);
+          gpio_put(LED_R, 0);
+          sleep_ms(500);
+        }
+        play_loss_theme(BUZZER);
+
+        round = 1;
+        count = 0;
+        blue = 0;
+        green = 0;
+        red = 0;
+        yellow = 0;
+        play_once = 0;
+        for (int i = 0; i < 16; i++) {
+          player_answer[i] = 5;
+        }
+        generateSequence(answer, 16);
+      }
     }
     
-    if (blue_flag) {
-      sleep_ms(1);
-      play(440, 100, BUZZER);
-      blue_flag = 0;
-      player_answer[count] = 0;
-      count += 1;
-    }
-    if (green_flag) {
-      sleep_ms(1);
-      play(392, 100, BUZZER);
-      green_flag = 0;
-      player_answer[count] = 1;
-      count += 1;
-    }
-    if (red_flag) {
-      sleep_ms(1);
-      play(262, 100, BUZZER);
-      red_flag = 0;
-      player_answer[count] = 2;
-      count += 1;
-    }
-    if (yellow_flag) {
-      sleep_ms(1);
-      play(294, 100, BUZZER);
-      yellow_flag = 0;
-      player_answer[count] = 3;
-      count += 1;
-    }
-
-    if (igualNoIntervalo(answer, player_answer, 0, count) == 1 && round == count)
-    {
-      for (int i = 0; i < 3; i++) 
-      {
-        gpio_put(LED_G, 1);
-        sleep_ms(500);
-        gpio_put(LED_G, 0);
-        sleep_ms(500);
-      }
-      play_victory_theme(BUZZER);
-
-      round += 1;      
-      count = 0;
-      blue = 0;
-      green = 0;
-      red = 0;
-      yellow = 0;
-      play_once = 0;
-      for (int i = 0; i < 16; i++) {
-        player_answer[i] = 5;
-      }
-    }
-
-    else if (round < count || player_answer[round-1] < 4)    
-    {
-      for (int i = 0; i < 3; i++) 
-      {
-        gpio_put(LED_R, 1);
-        sleep_ms(500);
-        gpio_put(LED_R, 0);
-        sleep_ms(500);
-      }
-      play_loss_theme(BUZZER);
-
-      round = 1;
-      count = 0;
-      blue = 0;
-      green = 0;
-      red = 0;
-      yellow = 0;
-      play_once = 0;
-      for (int i = 0; i < 16; i++) {
-        player_answer[i] = 5;
-      }
-    }
   }
 }
