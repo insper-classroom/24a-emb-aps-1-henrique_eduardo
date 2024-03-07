@@ -154,7 +154,6 @@ void start_game(int pino, int sequence[], int length) {
 int main() {
   int play_once = 0;
   int answer[16];
-  int player_answer[16];
   int round = 1;
   int count = 0;
   int errou=0;
@@ -230,16 +229,22 @@ int main() {
         if(answer[count] != btn_pressed_player){
             errou=1;
         }
+        else
+        {
+          errou = 2;
+        }
         count += 1;
       }
       if (green_flag) {
         sleep_ms(200);
         play(392, 100, BUZZER);
-        green_flag = 0;
-        player_answer[count] = 1;
-        
+        green_flag = 0;        
         if(answer[count] != btn_pressed_player){
             errou=1;
+        }
+        else
+        {
+          errou = 2;
         }
         count += 1;
       }
@@ -247,9 +252,12 @@ int main() {
         sleep_ms(200);
         play(262, 100, BUZZER);
         red_flag = 0;
-        player_answer[count] = 2;
         if(answer[count] != btn_pressed_player){
             errou=1;
+        }
+        else
+        {
+          errou = 2;
         }
         count += 1;
       }
@@ -257,14 +265,17 @@ int main() {
         sleep_ms(200);
         play(294, 100, BUZZER);
         yellow_flag = 0;
-        player_answer[count] = 3;
         if(answer[count] != btn_pressed_player){
             errou=1;
+        }
+        else
+        {
+          errou = 2;
         }
         count += 1;
       }
 
-      if (!errou)
+      if (errou == 2 && round <= count)
       {
         for (int i = 0; i < 3; i++) 
         {
@@ -282,12 +293,10 @@ int main() {
         red = 0;
         yellow = 0;
         play_once = 0;
-        for (int i = 0; i < 16; i++) {
-          player_answer[i] = 5;
-        }
+        errou = 0;
       }
 
-      else if (round < count || player_answer[round-1] < 4)    
+      else if (round < count || errou == 1)    
       {
         for (int i = 0; i < 3; i++) 
         {
@@ -306,9 +315,6 @@ int main() {
         yellow = 0;
         play_once = 0;
         errou=0;
-        for (int i = 0; i < 16; i++) {
-          player_answer[i] = 5;
-        }
         generateSequence(answer, 16);
       }
     }
