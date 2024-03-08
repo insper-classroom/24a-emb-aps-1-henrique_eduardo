@@ -11,20 +11,19 @@
 #include <time.h>
 #include <stdlib.h>
 
-const int BTN_PIN_B = 22;
-const int BTN_PIN_G = 20;
-const int BTN_PIN_R = 26;
-const int BTN_PIN_Y = 21;
+const int BTN_PIN_B = 4;
+const int BTN_PIN_G = 15;
+const int BTN_PIN_R = 3;
+const int BTN_PIN_Y = 14;
 const int BTN_PIN_START = 13;
-
-const int LED_B = 19;
-const int LED_G = 17;
-const int LED_R = 18;
-const int LED_Y = 16; 
+const int LED_B = 16;
+const int LED_G = 26;
+const int LED_R = 17;
+const int LED_Y = 6; 
 
 const int LED_R_RGB = 12;
 const int LED_G_RGB = 11;
-const int LED_B_RGB = 10;
+const int LED_B_RGB = 9;
 
 
 
@@ -36,10 +35,6 @@ volatile int red_flag = 0;
 volatile int yellow_flag = 0;
 volatile int flag_start = 0;
 
-volatile int blue = 0;
-volatile int green = 0;
-volatile int red = 0;
-volatile int yellow = 0;
 volatile int btn_pressed_player=10;
 
 void btn_callback(uint gpio, uint32_t events) {
@@ -78,14 +73,14 @@ void generateSequence(int sequence[], int length) {
     }
 }
 
-void displayColor(int color) {
+void displayColor(int color, int* blue, int* green, int* red, int* yellow) {
     if (color == 0) 
     {
       gpio_put(LED_B, 1);
       sleep_ms(500);
       gpio_put(LED_B, 0);
       sleep_ms(500);
-      blue += 1;
+      *blue += 1;
     }
     else if (color == 1) 
     {
@@ -93,7 +88,7 @@ void displayColor(int color) {
       sleep_ms(500);
       gpio_put(LED_G, 0);
       sleep_ms(500);
-      green += 1;
+      *green += 1;
     }
     else if (color == 2) 
     {
@@ -101,7 +96,7 @@ void displayColor(int color) {
       sleep_ms(500);
       gpio_put(LED_R, 0);
       sleep_ms(500);
-      red += 1;
+      *red += 1;
     }
     else if (color == 3) 
     {
@@ -109,7 +104,7 @@ void displayColor(int color) {
       sleep_ms(500);
       gpio_put(LED_Y, 0);
       sleep_ms(500);
-      yellow += 1;
+      *yellow += 1;
     }
 }
 
@@ -168,6 +163,10 @@ int main() {
   int round = 1;
   int count = 0;
   int errou=0;
+  int blue = 0;
+  int green = 0;
+  int red = 0;
+  int yellow = 0;
   stdio_init_all();
 
   gpio_init(BUZZER);
@@ -236,7 +235,7 @@ int main() {
       {
         for (int i = 0; i < round; i++)
         {
-          displayColor(answer[i]);
+          displayColor(answer[i], &blue, &green, &red, &yellow);
         }
 
         play_once = 1;
@@ -336,9 +335,9 @@ int main() {
       {
         for (int i = 0; i < 3; i++) 
         {
-          gpio_put(LED_R_RGB, 1);
+          gpio_put(LED_B_RGB, 1);
           sleep_ms(500);
-          gpio_put(LED_R_RGB, 0);
+          gpio_put(LED_B_RGB, 0);
           sleep_ms(500);
         }
         play_loss_theme(BUZZER);
