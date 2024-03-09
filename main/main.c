@@ -63,9 +63,11 @@ void btn_callback(uint gpio, uint32_t events) {
         }
         else if (gpio == BTN_PIN_START) {
             flag_start= 1;
-        }else if(events ==0x8){
-          if (gpio == BTN_PIN_R)
+        }
+        else if(events ==0x8){
+          if (gpio == BTN_PIN_R){
             flag_start = 0;
+          }
         }
     }
 }
