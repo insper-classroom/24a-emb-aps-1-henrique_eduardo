@@ -23,9 +23,17 @@ const int LED_R_RGB = 12;
 const int LED_G_RGB = 11;
 const int LED_B_RGB = 10;
 
-volatile tempo=0;
+volatile int tempo=0;
 volatile int delay=500;
 const int BUZZER = 2;
+
+volatile int blue_flag = 0;
+volatile int green_flag = 0;
+volatile int red_flag = 0;
+volatile int yellow_flag = 0;
+volatile int flag_start = 0;
+
+volatile int btn_pressed_player=10;
 
 volatile int btn_pressed = 0;
 volatile int verifica = 0;
@@ -73,14 +81,14 @@ void generateSequence(int sequence[], int length) {
     }
 }
 
-void displayColor(int color) {
+void displayColor(int color,, int* blue, int* green, int* red, int* yellow) {
     if (color == 0) 
     {
       gpio_put(LED_B, 1);
       sleep_ms(delay);
       gpio_put(LED_B, 0);
       sleep_ms(delay);
-      blue += 1;
+      *blue += 1;
     }
     else if (color == 1) 
     {
@@ -88,7 +96,7 @@ void displayColor(int color) {
       sleep_ms(delay);
       gpio_put(LED_G, 0);
       sleep_ms(delay);
-      green += 1;
+      *green += 1;
     }
     else if (color == 2) 
     {
@@ -96,7 +104,7 @@ void displayColor(int color) {
       sleep_ms(delay);
       gpio_put(LED_R, 0);
       sleep_ms(delay);
-      red += 1;
+      *red += 1;
     }
     else if (color == 3) 
     {
@@ -104,7 +112,7 @@ void displayColor(int color) {
       sleep_ms(delay);
       gpio_put(LED_Y, 0);
       sleep_ms(delay);
-      yellow += 1;
+      *yellow += 1;
     }
 }
 
@@ -176,7 +184,10 @@ int main() {
   int count = 0;
   int errou=0;
   int entrou=0
-  
+  int blue = 0;
+  int green = 0;
+  int red = 0;
+  int yellow = 0;
   alarm_id_t alarm_id;
   stdio_init_all();
   
@@ -251,7 +262,7 @@ int main() {
 
     }
     if(entrou && flag_f_r==0){
-      printf("Soltou o botão \n");
+    
       if(timer_fired){
         delay=300;
       }
@@ -267,7 +278,7 @@ int main() {
       {
         for (int i = 0; i < round; i++)
         {
-          displayColor(answer[i]);
+          displayColor(answer[i], &blue, &green, &red, &yellow);
         }
 
         play_once = 1;
