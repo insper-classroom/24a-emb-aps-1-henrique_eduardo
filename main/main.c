@@ -189,7 +189,7 @@ int main() {
   int green = 0;
   int red = 0;
   int yellow = 0;
-  alarm_id_t alarm_id;
+  
   stdio_init_all();
   
   
@@ -255,7 +255,7 @@ int main() {
     if(flag_start == 1)
     {
       if(!entrou){
-              
+        alarm_id_t alarm_id; 
         alarm_id=add_alarm_in_ms(1000, alarm_callback, NULL, false);
         entrou=1;
       }
