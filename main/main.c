@@ -38,7 +38,6 @@ volatile int btn_pressed_player=10;
 volatile int btn_pressed = 0;
 volatile int verifica = 0;
 volatile int n = 1;
-volatile int i = 0;
 volatile int comecou=0;
 volatile int timer_value = 0;
 volatile int timer_fired=0;
