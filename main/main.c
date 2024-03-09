@@ -41,6 +41,7 @@ volatile int n = 1;
 volatile int i = 0;
 volatile int comecou=0;
 volatile int timer_value = 0;
+volatile int timer_fired=0;
 
 void btn_callback(uint gpio, uint32_t events) {
     // Handle the button press based on the GPIO and events
@@ -81,7 +82,7 @@ void generateSequence(int sequence[], int length) {
     }
 }
 
-void displayColor(int color,, int* blue, int* green, int* red, int* yellow) {
+void displayColor(int color, int* blue, int* green, int* red, int* yellow) {
     if (color == 0) 
     {
       gpio_put(LED_B, 1);
@@ -183,7 +184,7 @@ int main() {
   int round = 1;
   int count = 0;
   int errou=0;
-  int entrou=0
+  int entrou=0;
   int blue = 0;
   int green = 0;
   int red = 0;
@@ -261,7 +262,7 @@ int main() {
       
 
     }
-    if(entrou && flag_f_r==0){
+    if(entrou && flag_start==0){
     
       if(timer_fired){
         delay=300;
