@@ -424,7 +424,7 @@ int main() {
         if (round >= 16)
         {
           sleep_ms(250);
-          playWin(BUZZER);
+          play_victory_theme(BUZZER);
           flag_start = 0;
         }      
         count = 0;
