@@ -238,10 +238,10 @@ void playWin(int pin) {
     int tempo = 144;
 
     float wholenote = (60000 * 4) / (float)tempo;
-    float divider = 0, noteDuration = 0;
 
     for (int thisNote = 0; thisNote < melodyLength * 2; thisNote = thisNote + 2) {
-        divider = melody[thisNote + 1];
+        float divider = melody[thisNote + 1];
+        float noteDuration;
         if (divider > 0) {
             noteDuration = (wholenote) / divider;
         } else if (divider < 0) {
@@ -253,10 +253,11 @@ void playWin(int pin) {
     }
 }
 
+
 int main() {
   int play_once = 0;
   int answer[16];
-  int round = 16;
+  int round = 1;
   int count = 0;
   int errou=0;
   int blue = 0;
