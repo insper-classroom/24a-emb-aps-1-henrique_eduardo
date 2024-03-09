@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "funcoes.h"
+#include "funcoes.c"
 
 void btn_callback(uint gpio, uint32_t events) {
     // Handle the button press based on the GPIO and events
