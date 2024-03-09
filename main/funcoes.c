@@ -204,7 +204,7 @@ void playWin(int pin) {
 
 }
 
-void verifica_button(int *answer,int *count, int *erro){
+void verifica_button(const int *answer,int *count, int *erro){
   if (blue_flag) {
         sleep_ms(200);
         play(440, 100, BUZZER);
