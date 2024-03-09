@@ -177,6 +177,13 @@ int main() {
         }
         play_loss_theme(BUZZER);
         sleep_ms(100);
+        for (int i = 0; i < count; i++) 
+        {
+          gpio_put(LED_B_RGB, 1);
+          sleep_ms(500);
+          gpio_put(LED_B_RGB, 0);
+          sleep_ms(500);
+        }
 
         round = 1;
         count = 0;
