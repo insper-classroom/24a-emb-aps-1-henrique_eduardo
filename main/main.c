@@ -11,29 +11,29 @@
 #include <time.h>
 #include <stdlib.h>
 
-const int BTN_PIN_B = 4;
-const int BTN_PIN_G = 15;
-const int BTN_PIN_R = 3;
+const int BTN_PIN_B = 12;
+const int BTN_PIN_G = 13;
+const int BTN_PIN_R = 15;
 const int BTN_PIN_Y = 14;
-const int BTN_PIN_START = 13;
+const int BTN_PIN_START = 17;
+
 const int LED_B = 16;
-const int LED_G = 26;
-const int LED_R = 17;
+const int LED_G = 18;
+const int LED_R = 20;
 const int LED_Y = 6; 
 
-const int LED_R_RGB = 12;
-const int LED_G_RGB = 11;
-const int LED_B_RGB = 9;
+const int LED_R_RGB = 2;
+const int LED_G_RGB = 3;
+const int LED_B_RGB = 4;
 
-
-
-const int BUZZER = 2;
+const int BUZZER = 28;
 
 volatile int blue_flag = 0;
 volatile int green_flag = 0;
 volatile int red_flag = 0;
 volatile int yellow_flag = 0;
 volatile int flag_start = 0;
+volatile int inicio = 0;
 
 volatile int btn_pressed_player=10;
 
@@ -57,7 +57,15 @@ void btn_callback(uint gpio, uint32_t events) {
             btn_pressed_player=3;
         }
         else if (gpio == BTN_PIN_START) {
-            flag_start= 1;
+          if (flag_start == 0)
+          {
+            inicio = 1;
+            flag_start = 1;
+          }
+          else if (flag_start == 2)
+          {
+            inicio = 2;
+          }
         }
     }
 }
@@ -124,6 +132,27 @@ void play_victory_theme(int pino) {
 
   for (int i = 0; i < sizeof(level_complete_notes) / sizeof(level_complete_notes[0]); i++) {
     play(level_complete_notes[i], level_complete_durations[i], pino);
+    sleep_ms(50); // Pause between notes
+  }
+}
+
+void play_turnoff_theme(int pino) {
+  int melody[] = {
+    440, 500, 0,  // A4 for 500ms, then silence
+    392, 500, 0,  // G4 for 500ms, then silence
+    349, 500, 0,  // F4 for 500ms, then silence
+    330, 500, 0,  // E4 for 500ms, then silence
+    294, 500, 0,  // D4 for 500ms, then silence
+    262, 500, 0   // C4 for 500ms, then silence
+  };
+
+  // Note durations corresponding to the melody
+  int noteDurations[] = {
+    500, 500, 500, 500, 500, 500
+  };
+
+  for (int i = 0; i < sizeof(melody) / sizeof(melody[0]); i++) {
+    play(melody[i], noteDurations[i], pino);
     sleep_ms(50); // Pause between notes
   }
 }
@@ -353,6 +382,12 @@ int main() {
         generateSequence(answer, 16);
       }
     }
-    
+
+    if (inicio == 2)
+    {
+      play_turnoff_theme(BUZZER);
+      inicio = 0;
+      flag_start = 0;
+    }    
   }
 }
