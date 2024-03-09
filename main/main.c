@@ -137,75 +137,7 @@ int main() {
         play_once = 1;
       }
       
-      if (blue_flag) {
-        sleep_ms(200);
-        play(440, 100, BUZZER);
-        blue_flag = 0;
-        if(answer[count] != btn_pressed_player){
-            errou=1;
-        }
-        else
-        {
-          errou = 2;
-        }
-        gpio_put(LED_B_RGB, 1);
-        sleep_ms(500);
-        gpio_put(LED_B_RGB, 0);
-        sleep_ms(500);
-        count += 1;
-      }
-      if (green_flag) {
-        sleep_ms(200);
-        play(392, 100, BUZZER);
-        green_flag = 0;        
-        if(answer[count] != btn_pressed_player){
-            errou=1;
-        }
-        else
-        {
-          errou = 2;
-        }
-        gpio_put(LED_G, 1);
-        sleep_ms(500);
-        gpio_put(LED_G, 0);
-        sleep_ms(500);
-        count += 1;
-      }
-      if (red_flag) {
-        sleep_ms(200);
-        play(262, 100, BUZZER);
-        red_flag = 0;
-        if(answer[count] != btn_pressed_player){
-            errou=1;
-        }
-        else
-        {
-          errou = 2;
-        }
-        gpio_put(LED_R, 1);
-        sleep_ms(500);
-        gpio_put(LED_R, 0);
-        sleep_ms(500);
-        count += 1;
-      }
-      if (yellow_flag) {
-        sleep_ms(200);
-        play(294, 100, BUZZER);
-        yellow_flag = 0;
-        if(answer[count] != btn_pressed_player){
-            errou=1;
-        }
-        else
-        {
-          errou = 2;
-        }
-        gpio_put(LED_Y, 1);
-        sleep_ms(500);
-        gpio_put(LED_Y, 0);
-        sleep_ms(500);
-        count += 1;
-      }
-
+      verifica_button(answer,&count,&errou);
       if (errou == 2 && round <= count)
       {
         for (int i = 0; i < 3; i++) 
