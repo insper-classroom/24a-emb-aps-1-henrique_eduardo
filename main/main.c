@@ -417,14 +417,14 @@ int main() {
           gpio_put(LED_G_RGB, 0);
           sleep_ms(500);
         }
-        playWin(BUZZER);
+        play_victory_theme(BUZZER);
         sleep_ms(100);
 
         round += 1;
         if (round >= 16)
         {
           sleep_ms(250);
-          play_victory_theme(BUZZER);
+          playWin(BUZZER);
           flag_start = 0;
         }      
         count = 0;
