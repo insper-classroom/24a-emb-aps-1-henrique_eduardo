@@ -151,7 +151,7 @@ bool timer_0_callback(repeating_timer_t *rt) {
     if(tempo==50000){
       g_timer_0=1;
     }
-    
+    return 1;
 }
 int igualNoIntervalo(int v[], int v2[], int l, int r) {
     if (l == r) {
