@@ -263,6 +263,15 @@ int main() {
       play_turnoff_theme(BUZZER);
       inicio = 0;
       flag_start = 0;
+      play_once = 0;
+      round = 1;
+      count = 0;
+      blue = 0;
+      green = 0;
+      red = 0;
+      yellow = 0;
+      play_once = 0;
+      errou=0;
     }    
   }
 }
