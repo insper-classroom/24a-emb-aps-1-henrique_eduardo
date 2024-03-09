@@ -82,7 +82,7 @@ void generateSequence(int sequence[], int length) {
     }
 }
 
-void displayColor(int color, int* blue, int* green, int* red, int* yellow) {
+void displayColor(int color, int* blue, int* green, int* red, int* yellow, int delay) {
     if (color == 0) 
     {
       gpio_put(LED_B, 1);
@@ -280,7 +280,7 @@ int main() {
       {
         for (int i = 0; i < round; i++)
         {
-          displayColor(answer[i], &blue, &green, &red, &yellow);
+          displayColor(answer[i], &blue, &green, &red, &yellow, delay);
         }
 
         play_once = 1;
