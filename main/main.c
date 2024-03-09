@@ -24,7 +24,7 @@ const int LED_G_RGB = 11;
 const int LED_B_RGB = 10;
 
 volatile int tempo=0;
-volatile int delay=500;
+
 const int BUZZER = 2;
 
 volatile int blue_flag = 0;
@@ -188,6 +188,7 @@ int main() {
   int blue = 0;
   int green = 0;
   int red = 0;
+  int delay=500;
   int yellow = 0;
   
   stdio_init_all();
