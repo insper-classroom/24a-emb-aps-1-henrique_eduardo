@@ -22,9 +22,9 @@ const int LED_G = 18;
 const int LED_R = 20;
 const int LED_Y = 6; 
 
-const int LED_R_RGB = 2;
+const int LED_B_RGB = 2;
 const int LED_G_RGB = 3;
-const int LED_B_RGB = 4;
+const int LED_R_RGB = 4;
 
 const int BUZZER = 28;
 
@@ -41,20 +41,32 @@ void btn_callback(uint gpio, uint32_t events) {
     // Handle the button press based on the GPIO and events
     if (events == 0x4) { // Falling edge
         if (gpio == BTN_PIN_B) {
+          if (inicio == 1)
+          {
             blue_flag = 1;
             btn_pressed_player=0;
+          }
         }
         else if (gpio == BTN_PIN_G) {
+          if (inicio == 1)
+          {
             green_flag = 1;
             btn_pressed_player=1;
+          }          
         }
         else if (gpio == BTN_PIN_R) {
+          if (inicio == 1)
+          {
             red_flag = 1;
             btn_pressed_player=2;
+          }
         }
         else if (gpio == BTN_PIN_Y) {
+          if (inicio == 1)
+          {
             yellow_flag = 1;
             btn_pressed_player=3;
+          }
         }
         else if (gpio == BTN_PIN_START) {
           if (flag_start == 0)
@@ -81,17 +93,31 @@ void generateSequence(int sequence[], int length) {
     }
 }
 
+void play(int freq, int tempo, int pino) {
+    int periodo = 1000000/freq;
+    for (int i = 0; i < (tempo*freq/1000); i++) {
+        gpio_put(pino, 1);
+        sleep_us(periodo/2);
+        gpio_put(pino, 0);
+        sleep_us(periodo/2);
+    }
+}
+
 void displayColor(int color, int* blue, int* green, int* red, int* yellow) {
     if (color == 0) 
     {
-      gpio_put(LED_B, 1);
+      sleep_ms(250);
+      play(440, 100, BUZZER);
+      gpio_put(LED_B_RGB, 1);
       sleep_ms(500);
-      gpio_put(LED_B, 0);
+      gpio_put(LED_B_RGB, 0);
       sleep_ms(500);
       *blue += 1;
     }
     else if (color == 1) 
     {
+      sleep_ms(250);
+      play(392, 100, BUZZER);
       gpio_put(LED_G, 1);
       sleep_ms(500);
       gpio_put(LED_G, 0);
@@ -100,6 +126,8 @@ void displayColor(int color, int* blue, int* green, int* red, int* yellow) {
     }
     else if (color == 2) 
     {
+      sleep_ms(250);
+      play(262, 100, BUZZER);
       gpio_put(LED_R, 1);
       sleep_ms(500);
       gpio_put(LED_R, 0);
@@ -108,21 +136,13 @@ void displayColor(int color, int* blue, int* green, int* red, int* yellow) {
     }
     else if (color == 3) 
     {
+      sleep_ms(250);
+      play(294, 100, BUZZER);
       gpio_put(LED_Y, 1);
       sleep_ms(500);
       gpio_put(LED_Y, 0);
       sleep_ms(500);
       *yellow += 1;
-    }
-}
-
-void play(int freq, int tempo, int pino) {
-    int periodo = 1000000/freq;
-    for (int i = 0; i < (tempo*freq/1000); i++) {
-        gpio_put(pino, 1);
-        sleep_us(periodo/2);
-        gpio_put(pino, 0);
-        sleep_us(periodo/2);
     }
 }
 
@@ -138,31 +158,25 @@ void play_victory_theme(int pino) {
 
 void play_turnoff_theme(int pino) {
   int melody[] = {
-    440, 500, 0,  // A4 for 500ms, then silence
-    392, 500, 0,  // G4 for 500ms, then silence
-    349, 500, 0,  // F4 for 500ms, then silence
-    330, 500, 0,  // E4 for 500ms, then silence
-    294, 500, 0,  // D4 for 500ms, then silence
-    262, 500, 0   // C4 for 500ms, then silence
+    440, 392, 349, 330, 294, 262
   };
 
-  // Note durations corresponding to the melody
-  int noteDurations[] = {
-    500, 500, 500, 500, 500, 500
-  };
+  // Duration of each note (500ms)
+  const int noteDuration = 500;
 
   for (int i = 0; i < sizeof(melody) / sizeof(melody[0]); i++) {
-    play(melody[i], noteDurations[i], pino);
+    play(melody[i], noteDuration, pino);
     sleep_ms(50); // Pause between notes
   }
 }
 
-void play_loss_theme(int pino) {
-  int level_complete_notes[] = {659, 659, 659, 659, 523, 523, 587, 659, 523, 440, 370, 440};
-  int level_complete_durations[] = {125, 125, 125, 125, 125, 125, 250, 125, 62, 125, 125, 125};
 
-  for (int i = 0; i < sizeof(level_complete_notes) / sizeof(level_complete_notes[0]); i++) {
-    play(level_complete_notes[i], level_complete_durations[i], pino);
+void play_loss_theme(int pino) {
+  int loss_notes[] = {131, 117, 104, 98, 78};
+  int loss_durations[] = {200, 200, 200, 200, 400};
+
+  for (int i = 0; i < sizeof(loss_notes) / sizeof(loss_notes[0]); i++) {
+    play(loss_notes[i], loss_durations[i], pino);
     sleep_ms(50); // Pause between notes
   }
 }
@@ -185,11 +199,64 @@ void start_game(int pino, int sequence[], int length) {
   flag_start = 2;
 }
 
+void playWin(int pin) {
+    int melody[] = {
+        0, 2, 294, 4,       // D4
+        392, -4, 466, 8, 440, 4, // G4, AS4, A4
+        392, 2, 587, 4,        // G4, D5
+        523, -2,               // C5
+        440, -2,               // A4
+        392, -4, 466, 8, 440, 4, // G4, AS4, A4
+        349, 2, 415, 4,        // F4, GS4
+        294, -1,               // D4
+        294, 4,                // D4
+        392, -4, 466, 8, 440, 4, // G4, AS4, A4
+        392, 2, 587, 4,        // G4, D5
+        698, 2, 659, 4,        // F5, E5
+        622, 2, 494, 4,        // DS5, B4
+        622, -4, 587, 8, 554, 4, // DS5, D5, CS5
+        554, 2, 494, 4,        // CS4, B4
+        392, -1,               // G4
+        466, 4,                // AS4
+        587, 2, 466, 4,        // D5, AS4
+        587, 2, 466, 4,        // D5, AS4
+        622, 2, 587, 4,        // DS5, D5
+        554, 2, 440, 4,        // CS5, A4
+        466, -4, 587, 8, 554, 4, // AS4, D5, CS5
+        554, 2, 587, 4,        // CS4, D4
+        587, -1,               // D5
+        0, 4, 466, 4,       // A4
+        587, 2, 466, 4,        // D5, AS4
+        587, 2, 466, 4,        // D5, AS4
+        698, 2, 659, 4,        // F5, E5
+        622, 2, 494, 4,        // DS5, B4
+        622, -4, 587, 8, 554, 4, // DS5, D5, CS5
+        554, 2, 466, 4,        // CS4, AS4
+        392, -1                // G4
+    };
+    int melodyLength = sizeof(melody) / sizeof(melody[0]) / 2;
+    int tempo = 144;
+
+    float wholenote = (60000 * 4) / (float)tempo;
+    float divider = 0, noteDuration = 0;
+
+    for (int thisNote = 0; thisNote < melodyLength * 2; thisNote = thisNote + 2) {
+        divider = melody[thisNote + 1];
+        if (divider > 0) {
+            noteDuration = (wholenote) / divider;
+        } else if (divider < 0) {
+            noteDuration = (wholenote) / (float)abs(divider);
+            noteDuration *= 1.5;
+        }
+        play(melody[thisNote], noteDuration, pin);
+        sleep_ms(1); // Optional pause between notes
+    }
+}
 
 int main() {
   int play_once = 0;
   int answer[16];
-  int round = 1;
+  int round = 16;
   int count = 0;
   int errou=0;
   int blue = 0;
@@ -281,9 +348,9 @@ int main() {
         {
           errou = 2;
         }
-        gpio_put(LED_B, 1);
+        gpio_put(LED_B_RGB, 1);
         sleep_ms(500);
-        gpio_put(LED_B, 0);
+        gpio_put(LED_B_RGB, 0);
         sleep_ms(500);
         count += 1;
       }
@@ -349,8 +416,15 @@ int main() {
           sleep_ms(500);
         }
         play_victory_theme(BUZZER);
+        sleep_ms(100);
 
-        round += 1;      
+        round += 1;
+        if (round >= 16)
+        {
+          sleep_ms(250);
+          playWin(BUZZER);
+          flag_start = 0;
+        }      
         count = 0;
         blue = 0;
         green = 0;
@@ -364,12 +438,13 @@ int main() {
       {
         for (int i = 0; i < 3; i++) 
         {
-          gpio_put(LED_B_RGB, 1);
+          gpio_put(LED_R_RGB, 1);
           sleep_ms(500);
-          gpio_put(LED_B_RGB, 0);
+          gpio_put(LED_R_RGB, 0);
           sleep_ms(500);
         }
         play_loss_theme(BUZZER);
+        sleep_ms(100);
 
         round = 1;
         count = 0;
