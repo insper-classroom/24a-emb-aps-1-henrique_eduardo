@@ -240,17 +240,18 @@ void playWin(int pin) {
     float wholenote = (60000 * 4) / (float)tempo;
 
     for (int thisNote = 0; thisNote < melodyLength * 2; thisNote = thisNote + 2) {
-        float divider = melody[thisNote + 1];
-        float noteDuration;
-        if (divider > 0) {
-            noteDuration = (wholenote) / divider;
-        } else if (divider < 0) {
-            noteDuration = (wholenote) / (float)abs(divider);
-            noteDuration *= 1.5;
-        }
-        play(melody[thisNote], noteDuration, pin);
-        sleep_ms(1); // Optional pause between notes
+      float divider = melody[thisNote + 1];
+      float noteDuration = 0; // Initialize noteDuration
+      if (divider > 0) {
+          noteDuration = (wholenote) / divider;
+      } else if (divider < 0) {
+          noteDuration = (wholenote) / (float)abs(divider);
+          noteDuration *= 1.5;
+      }
+      play(melody[thisNote], noteDuration, pin);
+      sleep_ms(1); // Optional pause between notes
     }
+
 }
 
 
@@ -416,7 +417,7 @@ int main() {
           gpio_put(LED_G_RGB, 0);
           sleep_ms(500);
         }
-        play_victory_theme(BUZZER);
+        playWin(BUZZER);
         sleep_ms(100);
 
         round += 1;
