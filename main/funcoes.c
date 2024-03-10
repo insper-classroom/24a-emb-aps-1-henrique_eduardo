@@ -139,7 +139,7 @@ void play_loss_theme(int pino) {
 
   for (int i = 0; i < sizeof(loss_notes) / sizeof(loss_notes[0]); i++) {
     play(loss_notes[i], loss_durations[i], pino);
-    sleep_ms(25); // Pause entre notas
+    sleep_ms(25);
   }
 }
 
@@ -153,12 +153,6 @@ int igualNoIntervalo(int v[], int v2[], int l, int r) {
     }
 
     return igualNoIntervalo(v, v2, l + 1, r);
-}
-
-void start_game(int pino, int sequence[], int length) {
-  play_victory_theme(BUZZER);
-  generateSequence(sequence, length);
-  flag_start = 2;
 }
 
 void playWin(int pin) {
@@ -203,7 +197,7 @@ void playWin(int pin) {
 
     for (int thisNote = 0; thisNote < melodyLength * 2; thisNote = thisNote + 2) {
       float divider = melody[thisNote + 1];
-      float noteDuration = 0; // Initialize noteDuration
+      float noteDuration = 0;
       if (divider > 0) {
           noteDuration = (wholenote) / divider;
       } else if (divider < 0) {
@@ -212,7 +206,24 @@ void playWin(int pin) {
       }
       play(melody[thisNote], noteDuration, pin);
     }
+}
 
+void play_turn_on_sound(int pino) {
+    int melody[] = {220, 330, 440, 550}; 
+    int durations[] = {100, 100, 100, 100}; 
+
+    for (int i = 0; i < sizeof(melody) / sizeof(melody[0]); i++) {
+        play(melody[i], durations[i], pino);
+        sleep_ms(50);
+    }
+}
+
+
+void start_game(int pino, int sequence[], int length) {
+  play_turn_on_sound(BUZZER);
+  sleep_ms(100);
+  generateSequence(sequence, length);
+  flag_start = 2;
 }
 
 void verifica_button(const int *answer,int *count, int *errou){
@@ -288,13 +299,13 @@ void verifica_button(const int *answer,int *count, int *errou){
 
 void show_points(int round) {
   for (int i = 0; i < round-1; i++) {
-    if (i % 4 == 0) { // Blue LED
+    if (i % 4 == 0) {
         gpio_put(LED_B_RGB, 1);
-    } else if (i % 4 == 1) { // Yellow LED
+    } else if (i % 4 == 1) {
         gpio_put(LED_Y, 1);
-    } else if (i % 4 == 2) { // Green LED
+    } else if (i % 4 == 2) {
         gpio_put(LED_G, 1);
-    } else if (i % 4 == 3) { // Red LED
+    } else if (i % 4 == 3) {
         gpio_put(LED_R, 1);
     }
     play_coin_sound(BUZZER);

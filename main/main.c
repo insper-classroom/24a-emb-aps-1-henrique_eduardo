@@ -153,7 +153,8 @@ int main() {
         round += 1;
         if (round >= 16)
         {
-          sleep_ms(250);
+          show_points(round);
+          sleep_ms(100);
           playWin(BUZZER);
           flag_start = 0;
         }      
