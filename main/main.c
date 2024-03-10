@@ -143,9 +143,9 @@ int main() {
         for (int i = 0; i < 3; i++) 
         {
           gpio_put(LED_G_RGB, 1);
-          sleep_ms(500);
+          sleep_ms(250);
           gpio_put(LED_G_RGB, 0);
-          sleep_ms(500);
+          sleep_ms(100);
         }
         play_victory_theme(BUZZER);
         sleep_ms(100);
@@ -165,7 +165,6 @@ int main() {
         play_once = 0;
         errou = 0;
       }
-
       else if (round < count || errou == 1)    
       {
         for (int i = 0; i < 3; i++) 
@@ -177,13 +176,8 @@ int main() {
         }
         play_loss_theme(BUZZER);
         sleep_ms(100);
-        for (int i = 0; i < count; i++) 
-        {
-          gpio_put(LED_B_RGB, 1);
-          sleep_ms(500);
-          gpio_put(LED_B_RGB, 0);
-          sleep_ms(500);
-        }
+
+        show_points(round);
 
         round = 1;
         count = 0;
